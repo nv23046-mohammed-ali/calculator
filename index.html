@@ -3,73 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Calculator</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .calculator {
-            background-color: #333;
-            border-radius: 10px;
-            width: 300px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .display {
-            background-color: #222;
-            color: white;
-            padding: 20px;
-            text-align: right;
-        }
-        #previous-operand {
-            font-size: 16px;
-            color: rgba(255,255,255,0.7);
-            height: 20px;
-        }
-        #current-operand {
-            font-size: 32px;
-            margin-top: 5px;
-        }
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-        }
-        button {
-            border: none;
-            background-color: #4d4d4d;
-            color: white;
-            padding: 20px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #666;
-        }
-        .operator {
-            background-color: #ff9500;
-        }
-        .operator:hover {
-            background-color: #ffb54d;
-        }
-        #zero {
-            grid-column: span 2;
-        }
-        #clear {
-            background-color: #a5a5a5;
-            color: black;
-        }
-    </style>
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="calculator">
@@ -79,162 +14,32 @@
         </div>
         <div class="buttons">
             <button id="clear" class="operator">AC</button>
-            <button id="backspace" class="operator">⌫</button>
+            <button id="backspace" class="operator">DEL</button>
+            <button id="percent" class="operator">%</button>
             <button id="divide" class="operator">÷</button>
             
-            <button id="seven" class="number">7</button>
-            <button id="eight" class="number">8</button>
-            <button id="nine" class="number">9</button>
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
             <button id="multiply" class="operator">×</button>
             
-            <button id="four" class="number">4</button>
-            <button id="five" class="number">5</button>
-            <button id="six" class="number">6</button>
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
             <button id="subtract" class="operator">-</button>
             
-            <button id="one" class="number">1</button>
-            <button id="two" class="number">2</button>
-            <button id="three" class="number">3</button>
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
             <button id="add" class="operator">+</button>
             
-            <button id="zero" class="number">0</button>
-            <button id="decimal" class="number">.</button>
+            <button class="number" id="zero">0</button>
+            <button class="number" id="decimal">.</button>
             <button id="equals" class="operator">=</button>
         </div>
     </div>
-
-    <script>
-        // Basic math operator functions
-        function add(a, b) {
-            return a + b;
-        }
-
-        function subtract(a, b) {
-            return a - b;
-        }
-
-        function multiply(a, b) {
-            return a * b;
-        }
-
-        function divide(a, b) {
-            if (b === 0) return "Error";
-            return a / b;
-        }
-
-        // Function to perform operation based on operator
-        function operate(operator, a, b) {
-            a = parseFloat(a);
-            b = parseFloat(b);
-            
-            switch(operator) {
-                case '+': return add(a, b);
-                case '-': return subtract(a, b);
-                case '×': return multiply(a, b);
-                case '÷': return divide(a, b);
-                default: return null;
-            }
-        }
-
-        // Calculator state variables
-        let firstOperand = null;
-        let currentOperator = null;
-        let resetScreen = false;
-
-        // DOM elements
-        const displayElement = document.getElementById('current-operand');
-        const previousDisplay = document.getElementById('previous-operand');
-
-        // Event listeners for numbers
-        document.querySelectorAll('.number').forEach(button => {
-            button.addEventListener('click', () => {
-                appendNumber(button.textContent);
-            });
-        });
-
-        // Event listeners for operators
-        document.querySelectorAll('.operator').forEach(button => {
-            if (button.id !== 'clear' && button.id !== 'equals' && button.id !== 'backspace') {
-                button.addEventListener('click', () => {
-                    handleOperator(button.textContent);
-                });
-            }
-        });
-
-        // Equals button
-        document.getElementById('equals').addEventListener('click', () => {
-            calculate();
-        });
-
-        // Clear button
-        document.getElementById('clear').addEventListener('click', () => {
-            clear();
-        });
-
-        // Backspace button
-        document.getElementById('backspace').addEventListener('click', () => {
-            backspace();
-        });
-
-        // Function to append number to display
-        function appendNumber(number) {
-            if (displayElement.textContent === '0' || resetScreen) {
-                displayElement.textContent = number;
-                resetScreen = false;
-            } else {
-                displayElement.textContent += number;
-            }
-        }
-
-        // Function to handle operators
-        function handleOperator(op) {
-            if (currentOperator !== null && !resetScreen) {
-                calculate();
-            }
-            
-            firstOperand = displayElement.textContent;
-            currentOperator = op;
-            previousDisplay.textContent = `${firstOperand} ${currentOperator}`;
-            resetScreen = true;
-        }
-
-        // Function to calculate result
-        function calculate() {
-            if (currentOperator === null || resetScreen) return;
-            
-            const secondOperand = displayElement.textContent;
-            
-            // Handle division by zero
-            if (currentOperator === '÷' && secondOperand === '0') {
-                displayElement.textContent = "Error";
-                return;
-            }
-            
-            const result = operate(currentOperator, firstOperand, secondOperand);
-            displayElement.textContent = typeof result === 'number' && result.toString().length > 10 ? 
-                                        result.toFixed(4) : result;
-            
-            previousDisplay.textContent = `${firstOperand} ${currentOperator} ${secondOperand} =`;
-            currentOperator = null;
-        }
-
-        // Function to clear calculator
-        function clear() {
-            displayElement.textContent = '0';
-            previousDisplay.textContent = '';
-            firstOperand = null;
-            currentOperator = null;
-            resetScreen = false;
-        }
-
-        // Function to handle backspace
-        function backspace() {
-            if (displayElement.textContent.length === 1) {
-                displayElement.textContent = '0';
-            } else {
-                displayElement.textContent = displayElement.textContent.slice(0, -1);
-            }
-        }
-    </script>
+    
+    <!-- Place script at end of body to ensure DOM is loaded -->
+    <script src="script.js"></script>
 </body>
 </html>
