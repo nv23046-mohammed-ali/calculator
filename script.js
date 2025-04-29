@@ -1,244 +1,129 @@
-// Basic math operations
+// Basic math operator functions
 function add(a, b) {
-  return a + b;
+    return a + b;
 }
 
 function subtract(a, b) {
-  return a - b;
+    return a - b;
 }
 
 function multiply(a, b) {
-  return a * b;
+    return a * b;
 }
 
 function divide(a, b) {
-  if (b === 0) {
-    return "Error: Division by zero";
-  }
-  return a / b;
+    if (b === 0) return "Error";
+    return a / b;
 }
 
-function percent(a) {
-  return a / 100;
-}
-
-// Operate function that calls the correct operation
+// Function to perform operation based on operator
 function operate(operator, a, b) {
-  // Convert string inputs to numbers
-  a = parseFloat(a);
-  b = parseFloat(b);
-  
-  switch(operator) {
-    case "+":
-      return add(a, b);
-    case "−":
-      return subtract(a, b);
-    case "×":
-      return multiply(a, b);
-    case "÷":
-      return divide(a, b);
-    case "%":
-      return percent(a);
-    default:
-      return "Error: Invalid operator";
-  }
+    a = parseFloat(a);
+    b = parseFloat(b);
+    
+    switch(operator) {
+        case '+': return add(a, b);
+        case '-': return subtract(a, b);
+        case '×': return multiply(a, b);
+        case '÷': return divide(a, b);
+        default: return null;
+    }
 }
 
 // Calculator state variables
-let displayValue = '0';
 let firstOperand = null;
-let operator = null;
-let waitingForSecondOperand = false;
-let calculationPerformed = false;
+let currentOperator = null;
+let resetScreen = false;
 
 // DOM elements
-const display = document.getElementById('display');
-const digitButtons = document.querySelectorAll('.digit');
-const operatorButtons = document.querySelectorAll('.operator');
-const equalsButton = document.getElementById('equals');
-const clearButton = document.getElementById('clear');
-const backspaceButton = document.getElementById('backspace');
-const decimalButton = document.getElementById('decimal');
+const displayElement = document.getElementById('current-operand');
+const previousDisplay = document.getElementById('previous-operand');
 
-// Helper function to round long decimals
-function roundResult(number) {
-  // Check if it's an error message
-  if (typeof number === 'string') {
-    return number;
-  }
-  
-  // Convert to string to check length
-  const numberString = number.toString();
-  
-  // If the number has a decimal point and is longer than 12 characters
-  if (numberString.includes('.') && numberString.length > 12) {
-    return parseFloat(number.toFixed(10)).toString();
-  }
-  
-  return numberString;
-}
-
-// Update display with current value
-function updateDisplay() {
-  display.textContent = displayValue;
-}
-
-// Handle digit button clicks
-digitButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const digit = button.textContent;
+// Load DOM event handlers
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded');
     
-    // If calculation was just performed, start fresh
-    if (calculationPerformed) {
-      displayValue = digit;
-      calculationPerformed = false;
-    } 
-    // If waiting for second operand, replace display with the new digit
-    else if (waitingForSecondOperand) {
-      displayValue = digit;
-      waitingForSecondOperand = false;
-    } 
-    // Otherwise append the digit (but avoid leading zeros)
-    else {
-      displayValue = displayValue === '0' ? digit : displayValue + digit;
-    }
+    // Add event listeners to number buttons
+    document.querySelectorAll('.number').forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Number clicked:', button.textContent);
+            appendNumber(button.textContent);
+        });
+    });
     
-    updateDisplay();
-  });
+    // Add event listeners to operators
+    document.querySelectorAll('.operator').forEach(button => {
+        if (button.id !== 'clear' && button.id !== 'equals' && button.id !== 'backspace') {
+            button.addEventListener('click', () => {
+                console.log('Operator clicked:', button.textContent);
+                handleOperator(button.textContent);
+            });
+        }
+    });
+    
+    // Equals button
+    document.getElementById('equals').addEventListener('click', () => {
+        console.log('Equals clicked');
+        calculate();
+    });
+    
+    // Clear button
+    document.getElementById('clear').addEventListener('click', () => {
+        console.log('Clear clicked');
+        clear();
+    });
+    
+    // Test log
+    console.log('All event listeners added');
 });
 
-// Handle operator button clicks
-operatorButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const newOperator = button.textContent;
-    
-    // If % is clicked, apply it immediately
-    if (newOperator === '%') {
-      const inputValue = parseFloat(displayValue);
-      displayValue = roundResult(percent(inputValue));
-      updateDisplay();
-      return;
+// Function to append number to display
+function appendNumber(number) {
+    if (displayElement.textContent === '0' || resetScreen) {
+        displayElement.textContent = number;
+        resetScreen = false;
+    } else {
+        displayElement.textContent += number;
+    }
+}
+
+// Function to handle operators
+function handleOperator(op) {
+    if (currentOperator !== null && !resetScreen) {
+        calculate();
     }
     
-    // If we have a pending operation, perform it first
-    if (firstOperand !== null && !waitingForSecondOperand) {
-      const result = operate(operator, firstOperand, displayValue);
-      displayValue = roundResult(result);
-      
-      // Display error if division by zero
-      if (displayValue === "Error: Division by zero") {
-        updateDisplay();
-        firstOperand = null;
-        operator = null;
-        waitingForSecondOperand = false;
+    firstOperand = displayElement.textContent;
+    currentOperator = op;
+    previousDisplay.textContent = `${firstOperand} ${currentOperator}`;
+    resetScreen = true;
+}
+
+// Function to calculate result
+function calculate() {
+    if (currentOperator === null || resetScreen) return;
+    
+    const secondOperand = displayElement.textContent;
+    
+    // Handle division by zero
+    if (currentOperator === '÷' && secondOperand === '0') {
+        displayElement.textContent = "Error";
         return;
-      }
-      
-      firstOperand = parseFloat(displayValue);
-      updateDisplay();
-    } else if (firstOperand === null) {
-      // First time an operator is pressed
-      firstOperand = parseFloat(displayValue);
     }
     
-    operator = newOperator;
-    waitingForSecondOperand = true;
-  });
-});
-
-// Handle equals button click
-equalsButton.addEventListener('click', () => {
-  // Only perform calculation if we have both operands and an operator
-  if (firstOperand !== null && operator !== null && !waitingForSecondOperand) {
-    const result = operate(operator, firstOperand, displayValue);
-    displayValue = roundResult(result);
+    const result = operate(currentOperator, firstOperand, secondOperand);
+    displayElement.textContent = typeof result === 'number' && result.toString().length > 10 ? 
+                                result.toFixed(4) : result;
     
-    // Reset the calculator state
+    previousDisplay.textContent = `${firstOperand} ${currentOperator} ${secondOperand} =`;
+    currentOperator = null;
+}
+
+// Function to clear calculator
+function clear() {
+    displayElement.textContent = '0';
+    previousDisplay.textContent = '';
     firstOperand = null;
-    operator = null;
-    waitingForSecondOperand = false;
-    calculationPerformed = true;
-    
-    updateDisplay();
-  }
-});
-
-// Handle clear button click
-clearButton.addEventListener('click', () => {
-  displayValue = '0';
-  firstOperand = null;
-  operator = null;
-  waitingForSecondOperand = false;
-  calculationPerformed = false;
-  updateDisplay();
-});
-
-// Handle backspace button click
-backspaceButton.addEventListener('click', () => {
-  if (waitingForSecondOperand || calculationPerformed) {
-    return;
-  }
-  
-  displayValue = displayValue.length > 1 ? 
-    displayValue.slice(0, -1) : '0';
-  updateDisplay();
-});
-
-// Handle decimal button click
-decimalButton.addEventListener('click', () => {
-  // If we just performed a calculation or are waiting for second operand, start fresh
-  if (calculationPerformed) {
-    displayValue = '0.';
-    calculationPerformed = false;
-  } else if (waitingForSecondOperand) {
-    displayValue = '0.';
-    waitingForSecondOperand = false;
-  } 
-  // Only add decimal if there isn't one already
-  else if (!displayValue.includes('.')) {
-    displayValue += '.';
-  }
-  
-  updateDisplay();
-});
-
-// Add keyboard support
-document.addEventListener('keydown', (event) => {
-  // Digits
-  if (/[0-9]/.test(event.key)) {
-    document.getElementById(event.key).click();
-  }
-  // Operators
-  else if (event.key === '+') {
-    document.getElementById('add').click();
-  }
-  else if (event.key === '-') {
-    document.getElementById('subtract').click();
-  }
-  else if (event.key === '*') {
-    document.getElementById('multiply').click();
-  }
-  else if (event.key === '/') {
-    event.preventDefault(); // Prevent browser's "Quick Find"
-    document.getElementById('divide').click();
-  }
-  // Special keys
-  else if (event.key === '.') {
-    document.getElementById('decimal').click();
-  }
-  else if (event.key === '=' || event.key === 'Enter') {
-    document.getElementById('equals').click();
-  }
-  else if (event.key === 'Escape') {
-    document.getElementById('clear').click();
-  }
-  else if (event.key === 'Backspace') {
-    document.getElementById('backspace').click();
-  }
-  else if (event.key === '%') {
-    document.getElementById('percent').click();
-  }
-});
-
-// Initialize display
-updateDisplay();
+    currentOperator = null;
+    resetScreen = false;
+}
