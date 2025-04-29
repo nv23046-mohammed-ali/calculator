@@ -4,41 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 300px;
+        }
+
+        .display {
+            background-color: #eaeaea;
+            border-radius: 5px;
+            font-size: 2.5rem;
+            height: 60px;
+            margin-bottom: 20px;
+            padding: 10px;
+            text-align: right;
+            width: calc(100% - 20px);
+            overflow: hidden;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+
+        button {
+            background-color: #4a4a4a;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+            height: 60px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #5a5a5a;
+        }
+
+        .operator {
+            background-color: #f59906;
+        }
+
+        .operator:hover {
+            background-color: #ffae33;
+        }
+
+        .clear, .backspace {
+            background-color: #d9534f;
+        }
+
+        .clear:hover, .backspace:hover {
+            background-color: #e06b68;
+        }
+
+        .equals {
+            background-color: #5cb85c;
+        }
+
+        .equals:hover {
+            background-color: #79c879;
+        }
+
+        .decimal {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="calculator">
-        <div class="display">
-            <div id="previous-operand"></div>
-            <div id="current-operand">0</div>
-        </div>
+        <div class="display" id="display">0</div>
         <div class="buttons">
-            <button class="operator" id="clear">AC</button>
-            <button class="operator" id="backspace">DEL</button>
+            <button class="clear" id="clear">AC</button>
+            <button class="backspace" id="backspace">⌫</button>
             <button class="operator" id="percent">%</button>
             <button class="operator" id="divide">÷</button>
             
-            <button class="number" id="seven">7</button>
-            <button class="number" id="eight">8</button>
-            <button class="number" id="nine">9</button>
+            <button class="digit" id="7">7</button>
+            <button class="digit" id="8">8</button>
+            <button class="digit" id="9">9</button>
             <button class="operator" id="multiply">×</button>
             
-            <button class="number" id="four">4</button>
-            <button class="number" id="five">5</button>
-            <button class="number" id="six">6</button>
-            <button class="operator" id="subtract">-</button>
+            <button class="digit" id="4">4</button>
+            <button class="digit" id="5">5</button>
+            <button class="digit" id="6">6</button>
+            <button class="operator" id="subtract">−</button>
             
-            <button class="number" id="one">1</button>
-            <button class="number" id="two">2</button>
-            <button class="number" id="three">3</button>
+            <button class="digit" id="1">1</button>
+            <button class="digit" id="2">2</button>
+            <button class="digit" id="3">3</button>
             <button class="operator" id="add">+</button>
             
-            <button class="number" id="zero">0</button>
-            <button class="number" id="decimal">.</button>
-            <button class="operator" id="equals">=</button>
+            <button class="digit" id="0">0</button>
+            <button class="decimal" id="decimal">.</button>
+            <button class="equals" id="equals">=</button>
         </div>
     </div>
-    
     <script src="script.js"></script>
 </body>
 </html>
